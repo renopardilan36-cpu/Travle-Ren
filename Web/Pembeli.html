@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelNesia - Booking Tiket Liburan</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0ea5e9', // Cyan
+                        secondary: '#10b981', // Emerald
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans pb-24 md:pb-12">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-slate-900 bg-opacity-70 z-50 flex flex-col items-center justify-center text-white">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-primary border-solid mb-3"></div>
+        <p class="text-sm font-medium">Menghubungkan ke Server...</p>
+    </div>
+
+    <!-- Header Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="bg-primary text-white p-2 rounded-xl">
+                    <i class="fa-solid fa-plane-departure text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900">TravelNesia</h1>
+                    <p class="text-xs text-slate-500">Temukan Liburan Impianmu</p>
+                </div>
+            </div>
+            <!-- Navigasi Desktop -->
+            <nav class="hidden md:flex space-x-6">
+                <button onclick="switchTab('home')" id="desktop-tab-home" class="font-semibold text-sm text-primary transition">Beranda</button>
+                <button onclick="switchTab('orders')" id="desktop-tab-orders" class="font-semibold text-sm text-slate-500 hover:text-slate-800 transition">Riwayat Pesanan</button>
+                <button onclick="switchTab('eticket')" id="desktop-tab-eticket" class="font-semibold text-sm text-slate-500 hover:text-slate-800 transition">TiketKu</button>
+                <a href="User.html" class="font-semibold text-sm text-slate-500 hover:text-slate-800 transition">User</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        
+        <!-- SECTION: BERANDA (KATALOG DESTINASI) -->
+        <section id="section-home" class="space-y-6">
+            <div class="bg-gradient-to-r from-sky-500 to-emerald-500 rounded-3xl p-6 md:p-10 text-white shadow-md">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">Jelajahi Destinasi Wisata Terbaik</h2>
+                <p class="text-sm md:text-base opacity-90 max-w-xl">Pesan tiket liburanmu sekarang, nikmati kemudahan proses dan dapatkan e-ticket instan setelah dikonfirmasi!.</p>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Destinasi Pilihan</h3>
+                <div id="destinations-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="text-center py-12 text-slate-400 col-span-full">Memuat destinasi wisata...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: RIWAYAT PESANAN -->
+        <section id="section-orders" class="space-y-6 hidden">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">Riwayat Pesanan Saya</h2>
+                <p class="text-sm text-slate-500">Pantau status pesanan tiket liburanmu di sini.</p>
+            </div>
+            <div id="orders-container" class="space-y-4">
+                <div class="text-center py-12 text-slate-400">Belum ada riwayat pesanan.</div>
+            </div>
+        </section>
+
+        <!-- SECTION: E-TICKET (TIKETKU) -->
+        <section id="section-eticket" class="space-y-6 hidden">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">TiketKu (E-Ticket Resmi)</h2>
+                <p class="text-sm text-slate-500">Tiket yang sudah disetujui (ACC) oleh admin akan muncul di sini.</p>
+            </div>
+            <div id="etickets-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="text-center py-12 text-slate-400 col-span-full">Belum ada E-Ticket aktif. Selesaikan pesanan dan tunggu persetujuan admin.</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- BOTTOM NAVBAR (MOBILE) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-3 px-3 flex justify-around items-center z-30 shadow-lg">
+        <button onclick="switchTab('home')" id="mobile-tab-home" class="flex flex-col items-center text-primary">
+            <i class="fa-solid fa-house text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Beranda</span>
+        </button>
+        <button onclick="switchTab('orders')" id="mobile-tab-orders" class="flex flex-col items-center text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-receipt text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Pesanan</span>
+        </button>
+        <button onclick="switchTab('eticket')" id="mobile-tab-eticket" class="flex flex-col items-center text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-ticket text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">TiketKu</span>
+        </button>
+        <a href="User.html" class="flex flex-col items-center text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-user-gear text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">User</span>
+        </a>
+    </nav>
+
+    <!-- MODAL FORM PEMESANAN (CHECKOUT) -->
+    <div id="booking-modal" class="fixed inset-0 bg-slate-900 bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-lg text-slate-900">Formulir Pesanan Tiket</h3>
+                <button onclick="closeBookingModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="booking-form" onsubmit="submitBooking(event)" class="space-y-4">
+                <input type="hidden" id="book-dest-id">
+                <input type="hidden" id="book-dest-name">
+                <input type="hidden" id="book-dest-price">
+                <input type="hidden" id="book-dest-date">
+                <input type="hidden" id="book-dest-time">
+                <input type="hidden" id="book-dest-vehicle">
+
+                <div class="bg-sky-50 p-3 rounded-xl">
+                    <h4 id="book-title-display" class="font-bold text-sm text-slate-900">Nama Destinasi</h4>
+                    <p id="book-schedule-display" class="text-xs text-slate-500 mt-1"><i class="fa-regular fa-calendar mr-1"></i> Jadwal: -</p>
+                    <p id="book-vehicle-display" class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-bus mr-1"></i> Kendaraan: Bus (60 kursi)</p>
+                    <p id="book-price-display" class="text-xs font-semibold text-primary mt-1">Rp 0 / tiket</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap Pemesan</label>
+                    <input type="text" id="buyer-name" required class="w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Nama Anda">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nomor WhatsApp / HP</label>
+                    <input type="tel" id="buyer-phone" required class="w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="08xxxxxxxxxx">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Jumlah Tiket</label>
+                    <input type="number" id="buyer-qty" min="1" max="60" value="1" oninput="renderTicketNameInputs(); calculateTotal()" required class="w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Nama Pemilik Setiap Tiket</label>
+                    <div id="ticket-names-container" class="space-y-3"></div>
+                </div>
+
+                <div class="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-3">
+                    <p class="text-[11px] text-slate-600">Kursi akan ditentukan oleh admin setelah pesanan Anda dikonfirmasi.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kode Voucher (Opsional)</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="buyer-voucher" placeholder="Masukkan kode voucher" class="w-full px-4 py-2 border rounded-xl text-sm uppercase focus:outline-none focus:ring-2 focus:ring-primary">
+                        <button type="button" onclick="applyVoucher()" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-medium hover:bg-slate-700">Gunakan</button>
+                    </div>
+                    <p id="voucher-msg" class="text-xs mt-1"></p>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border flex justify-between items-center">
+                    <span class="text-xs font-semibold text-slate-600">Total Pembayaran:</span>
+                    <span id="total-price-display" class="font-bold text-base text-primary">Rp 0</span>
+                </div>
+
+                <div class="border-t pt-3">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Upload Bukti Transfer Pembayaran</label>
+                    <input type="file" id="payment-proof-file" accept="image/*" required class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-semibold file:bg-sky-50 file:text-primary hover:file:bg-sky-100">
+                    <input type="hidden" id="payment-proof-url">
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t">
+                    <button type="button" onclick="closeBookingModal()" class="px-4 py-2 border rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-sky-600 transition">Kirim Pesanan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL E-TICKET (UNTUK PAMER KE SOSMED) -->
+    <div id="eticket-modal" class="fixed inset-0 bg-slate-900 bg-opacity-70 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-xl overflow-hidden relative">
+            <div class="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-sky-500 to-emerald-500"></div>
+            <div class="flex justify-between items-center border-b pb-3 pt-2">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-primary text-white p-1.5 rounded-lg text-xs"><i class="fa-solid fa-ticket"></i></div>
+                    <h3 class="font-bold text-base text-slate-950">E-Ticket Resmi TravelNesia</h3>
+                </div>
+                <button onclick="closeEticketModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <!-- Konten Kartu Tiket untuk Dibagikan -->
+            <div id="eticket-card-content" class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+                <div class="text-center pb-2 border-b border-dashed">
+                    <h4 id="etick-dest" class="font-bold text-lg text-slate-900">Nama Destinasi</h4>
+                    <p class="text-xs text-emerald-600 font-medium">Status: LUNAS & DISETUJUI (ACC)</p>
+                </div>
+                <div class="space-y-1.5 text-xs text-slate-700">
+                    <div class="flex justify-between"><span>Nama Pemesan:</span> <span id="etick-name" class="font-bold"></span></div>
+                    <div><span>Nama Pemilik Tiket:</span> <p id="etick-ticket-names" class="font-bold text-slate-900 mt-1"></p></div>
+                    <div class="flex justify-between"><span>Jumlah Tiket:</span> <span id="etick-qty" class="font-bold"></span></div>
+                    <div class="flex justify-between"><span>Kendaraan:</span> <span id="etick-vehicle" class="font-bold"></span></div>
+                    <div class="flex justify-between"><span>Nomor Kursi:</span> <span id="etick-seats" class="font-bold text-primary"></span></div>
+                    <div class="flex justify-between"><span>Tanggal Berangkat:</span> <span id="etick-date" class="font-bold text-primary"></span></div>
+                    <div class="flex justify-between"><span>Waktu Berangkat:</span> <span id="etick-time" class="font-bold text-primary"></span></div>
+                </div>
+                <div class="pt-2 border-t text-center">
+                    <p class="text-[10px] text-slate-400">Tunjukkan e-ticket ini kepada petugas di lokasi wisata.</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 pt-2">
+                <button onclick="shareTicket()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center justify-center">
+                    <i class="fa-solid fa-share-nodes mr-2"></i> Pamerkan ke Sosmed
+                </button>
+                <button onclick="closeEticketModal()" class="px-4 py-2.5 bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logika Pembeli -->
+    <script>
+        const DESTINATIONS_STORAGE_KEY = 'travelnesia.destinations';
+        const ORDERS_STORAGE_KEY = 'travelnesia.orders';
+        let destinationsCache = [];
+        let ordersCache = [];
+        let currentUnitPrice = 0;
+        let isVoucherApplied = false;
+
+        function initBuyerApp() {
+            refreshStoredData();
+            window.addEventListener('storage', handleStorageChange);
+            window.addEventListener('travelnesia:storage-changed', handleLocalStorageChange);
+            window.setInterval(renderDestinations, 60_000);
+
+            // Handler kompresi file bukti transfer
+            document.getElementById('payment-proof-file').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            const MAX_WIDTH = 800;
+                            const MAX_HEIGHT = 800;
+                            let width = img.width;
+                            let height = img.height;
+
+                            if (width > height) {
+                                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                            } else {
+                                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(img, 0, 0, width, height);
+                            document.getElementById('payment-proof-url').value = canvas.toDataURL('image/jpeg', 0.7);
+                        }
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('loading-screen').style.display = 'none';
+        }
+
+        function readStoredItems(key) {
+            const storedValue = localStorage.getItem(key);
+            if (!storedValue) return [];
+
+            const items = JSON.parse(storedValue);
+            if (!Array.isArray(items)) {
+                throw new Error(`Data ${key} tidak valid.`);
+            }
+            return items;
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        function refreshStoredData() {
+            try {
+                destinationsCache = readStoredItems(DESTINATIONS_STORAGE_KEY);
+                ordersCache = readStoredItems(ORDERS_STORAGE_KEY);
+                ordersCache.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                renderDestinations();
+                renderOrders();
+                renderETickets();
+            } catch (error) {
+                console.error('Gagal membaca data TravelNesia:', error);
+                document.getElementById('destinations-grid').innerHTML =
+                    `<div class="text-center py-12 text-red-500 col-span-full">Gagal membaca data tersimpan. Periksa penyimpanan browser.</div>`;
+            }
+        }
+
+        function handleStorageChange(event) {
+            if ([DESTINATIONS_STORAGE_KEY, ORDERS_STORAGE_KEY].includes(event.key)) {
+                refreshStoredData();
+            }
+        }
+
+        function handleLocalStorageChange(event) {
+            if ([DESTINATIONS_STORAGE_KEY, ORDERS_STORAGE_KEY].includes(event.detail?.key)) {
+                refreshStoredData();
+            }
+        }
+
+        function saveStoredItems(key, items) {
+            localStorage.setItem(key, JSON.stringify(items));
+            window.dispatchEvent(new CustomEvent('travelnesia:storage-changed', { detail: { key } }));
+        }
+
+        function createLocalId() {
+            return window.crypto?.randomUUID
+                ? window.crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        }
+
+        // Navigasi Tab Pembeli
+        function switchTab(tabName) {
+            const homeSec = document.getElementById('section-home');
+            const orderSec = document.getElementById('section-orders');
+            const eticketSec = document.getElementById('section-eticket');
+
+            const tabHomeMobile = document.getElementById('mobile-tab-home');
+            const tabOrderMobile = document.getElementById('mobile-tab-orders');
+            const tabEticketMobile = document.getElementById('mobile-tab-eticket');
+
+            const tabHomeDesk = document.getElementById('desktop-tab-home');
+            const tabOrderDesk = document.getElementById('desktop-tab-orders');
+            const tabEticketDesk = document.getElementById('desktop-tab-eticket');
+
+            // Reset semua
+            homeSec.classList.add('hidden');
+            orderSec.classList.add('hidden');
+            eticketSec.classList.add('hidden');
+            
+            [tabHomeMobile, tabOrderMobile, tabEticketMobile].forEach(el => el.className = "flex flex-col items-center text-slate-400 hover:text-slate-600");
+            [tabHomeDesk, tabOrderDesk, tabEticketDesk].forEach(el => el.className = "font-semibold text-sm text-slate-500 hover:text-slate-800 transition");
+
+            if (tabName === 'home') {
+                homeSec.classList.remove('hidden');
+                tabHomeMobile.className = "flex flex-col items-center text-primary";
+                tabHomeDesk.className = "font-semibold text-sm text-primary transition";
+            } else if (tabName === 'orders') {
+                orderSec.classList.remove('hidden');
+                tabOrderMobile.className = "flex flex-col items-center text-primary";
+                tabOrderDesk.className = "font-semibold text-sm text-primary transition";
+            } else if (tabName === 'eticket') {
+                eticketSec.classList.remove('hidden');
+                tabEticketMobile.className = "flex flex-col items-center text-primary";
+                tabEticketDesk.className = "font-semibold text-sm text-primary transition";
+            }
+        }
+
+        function isDestinationExpired(destination, now = new Date()) {
+            const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(destination.date || '');
+            if (!dateMatch) return false;
+
+            const [, year, month, day] = dateMatch.map(Number);
+            const date = new Date(year, month - 1, day);
+            if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+                return false;
+            }
+
+            let hours = 23;
+            let minutes = 59;
+            let seconds = 59;
+            let milliseconds = 999;
+            if (destination.time) {
+                const timeMatch = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(destination.time);
+                if (!timeMatch) return false;
+                hours = Number(timeMatch[1]);
+                minutes = Number(timeMatch[2]);
+                seconds = 0;
+                milliseconds = 0;
+            }
+
+            const departure = new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
+            return departure.getTime() <= now.getTime();
+        }
+
+        // Render Katalog Destinasi
+        function renderDestinations() {
+            const grid = document.getElementById('destinations-grid');
+            if (destinationsCache.length === 0) {
+                grid.innerHTML = `<div class="text-center py-12 text-slate-400 col-span-full">Belum ada destinasi tersedia saat ini.</div>`;
+                return;
+            }
+
+            grid.innerHTML = destinationsCache.map(d => {
+                const expired = isDestinationExpired(d);
+                return `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <div class="relative h-48 bg-slate-200">
+                            <img src="${d.image || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" alt="${d.name}" class="w-full h-full object-cover">
+                            <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-slate-900 text-xs font-bold px-3 py-1 rounded-full shadow">
+                                Rp ${Number(d.price).toLocaleString('id-ID')}
+                            </span>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <h3 class="font-bold text-lg text-slate-900">${d.name}</h3>
+                            <p class="text-xs text-slate-500 flex items-center"><i class="fa-solid fa-location-dot mr-1 text-primary"></i> ${d.location}</p>
+                            <p class="text-xs text-emerald-600 font-medium"><i class="fa-regular fa-calendar mr-1"></i> Keberangkatan: ${d.date || '-'} | <i class="fa-regular fa-clock mr-1"></i> ${d.time || '-'}</p>
+                            <p class="text-xs text-slate-600"><i class="fa-solid fa-bus mr-1 text-primary"></i> ${d.vehicle || 'Bus (60 kursi)'}</p>
+                            <p class="text-xs text-slate-600 line-clamp-2">${d.description}</p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-50 border-t">
+                        <button onclick="openBookingModal('${d.id}')" ${expired ? 'disabled' : ''} class="w-full py-2 ${expired ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-sky-600'} text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center justify-center">
+                            <i class="fa-solid ${expired ? 'fa-ban' : 'fa-ticket'} mr-2"></i> ${expired ? 'Keberangkatan Sudah Lewat' : 'Pesan Tiket Sekarang'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Buka Modal Pemesanan
+        function openBookingModal(id) {
+            const d = destinationsCache.find(item => item.id === id);
+            if (!d) return;
+            if (isDestinationExpired(d)) {
+                alert('Tiket tidak bisa dibeli karena waktu keberangkatannya sudah lewat.');
+                renderDestinations();
+                return;
+            }
+
+            document.getElementById('book-dest-id').value = d.id;
+            document.getElementById('book-dest-name').value = d.name;
+            document.getElementById('book-dest-price').value = d.price;
+            document.getElementById('book-dest-date').value = d.date || '';
+            document.getElementById('book-dest-time').value = d.time || '';
+            document.getElementById('book-dest-vehicle').value = d.vehicle || 'Bus (60 kursi)';
+
+            currentUnitPrice = Number(d.price);
+            isVoucherApplied = false;
+
+            document.getElementById('book-title-display').innerText = d.name;
+            document.getElementById('book-schedule-display').innerHTML = `<i class="fa-regular fa-calendar mr-1"></i> Jadwal: ${d.date || '-'} (${d.time || '-'})`;
+            document.getElementById('book-vehicle-display').innerHTML = `<i class="fa-solid fa-bus mr-1"></i> Kendaraan: ${d.vehicle || 'Bus (60 kursi)'}`;
+            document.getElementById('book-price-display').innerText = `Rp ${currentUnitPrice.toLocaleString('id-ID')} / tiket`;
+
+            document.getElementById('buyer-qty').value = 1;
+            document.getElementById('buyer-name').value = '';
+            document.getElementById('buyer-phone').value = '';
+            document.getElementById('buyer-voucher').value = '';
+            document.getElementById('voucher-msg').innerText = '';
+            document.getElementById('payment-proof-file').value = '';
+            document.getElementById('payment-proof-url').value = '';
+
+            renderTicketNameInputs();
+            calculateTotal();
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function renderTicketNameInputs() {
+            const container = document.getElementById('ticket-names-container');
+            const qtyInput = document.getElementById('buyer-qty');
+            const qty = Number.parseInt(qtyInput.value, 10);
+            const currentNames = Array.from(container.querySelectorAll('input')).map(input => input.value);
+
+            if (!Number.isInteger(qty) || qty < 1 || qty > 60) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = Array.from({ length: qty }, (_, index) => `
+                <div>
+                    <label for="ticket-name-${index}" class="block text-xs text-slate-500 mb-1">Nama tiket ${index + 1}</label>
+                    <input type="text" id="ticket-name-${index}" name="ticketNames" required value="${escapeHtml(currentNames[index] || '')}" class="w-full px-4 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Nama lengkap pemilik tiket ${index + 1}">
+                </div>
+            `).join('');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        // Kalkulasi Total Harga & Voucher
+        function calculateTotal() {
+            const qty = parseInt(document.getElementById('buyer-qty').value) || 1;
+            let total = currentUnitPrice * qty;
+
+            const voucherCode = document.getElementById('buyer-voucher').value.trim().toUpperCase();
+            const msgEl = document.getElementById('voucher-msg');
+
+            if (isVoucherApplied && voucherCode === 'RDPLD 4') {
+                if (qty >= 3) {
+                    total -= 50000;
+                    msgEl.className = "text-xs mt-1 text-emerald-600 font-medium";
+                    msgEl.innerText = "Voucher RDPLD 4 berhasil digunakan (-Rp 50.000)";
+                } else {
+                    isVoucherApplied = false;
+                    msgEl.className = "text-xs mt-1 text-amber-600";
+                    msgEl.innerText = "Voucher dibatalkan: Minimal pembelian 3 tiket untuk menggunakan RDPLD 4.";
+                }
+            } else if (voucherCode && voucherCode !== 'RDPLD 4') {
+                msgEl.className = "text-xs mt-1 text-red-500";
+                msgEl.innerText = "Kode voucher tidak valid.";
+            }
+
+            if (total < 0) total = 0;
+            document.getElementById('total-price-display').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function applyVoucher() {
+            const code = document.getElementById('buyer-voucher').value.trim().toUpperCase();
+            const qty = parseInt(document.getElementById('buyer-qty').value) || 1;
+            const msgEl = document.getElementById('voucher-msg');
+
+            if (code === 'RDPLD 4') {
+                if (qty >= 3) {
+                    isVoucherApplied = true;
+                    msgEl.className = "text-xs mt-1 text-emerald-600 font-medium";
+                    msgEl.innerText = "Voucher RDPLD 4 berhasil diterapkan!";
+                } else {
+                    isVoucherApplied = false;
+                    msgEl.className = "text-xs mt-1 text-red-500";
+                    msgEl.innerText = "Syarat tidak terpenuhi: Minimal pembelian 3 tiket!";
+                }
+            } else {
+                isVoucherApplied = false;
+                msgEl.className = "text-xs mt-1 text-red-500";
+                msgEl.innerText = "Kode voucher salah atau tidak terdaftar.";
+            }
+            calculateTotal();
+        }
+
+        // Kirim pesanan ke penyimpanan browser
+        async function submitBooking(e) {
+            e.preventDefault();
+
+            let destination;
+            try {
+                destination = readStoredItems(DESTINATIONS_STORAGE_KEY)
+                    .find(item => item.id === document.getElementById('book-dest-id').value);
+            } catch (err) {
+                console.error('Gagal memeriksa jadwal destinasi:', err);
+                alert('Gagal memeriksa jadwal tiket. Silakan muat ulang halaman dan coba lagi.');
+                return;
+            }
+            if (!destination) {
+                alert('Destinasi ini sudah tidak tersedia. Silakan pilih destinasi lain.');
+                closeBookingModal();
+                refreshStoredData();
+                return;
+            }
+            if (isDestinationExpired(destination)) {
+                alert('Tiket tidak bisa dibeli karena waktu keberangkatannya sudah lewat.');
+                closeBookingModal();
+                refreshStoredData();
+                return;
+            }
+
+            const proofUrl = document.getElementById('payment-proof-url').value;
+            if (!proofUrl) {
+                alert("Silakan pilih dan upload bukti pembayaran terlebih dahulu.");
+                return;
+            }
+
+            const qty = parseInt(document.getElementById('buyer-qty').value) || 1;
+            if (!Number.isInteger(qty) || qty < 1 || qty > 60) {
+                alert('Jumlah tiket harus antara 1 sampai 60.');
+                return;
+            }
+            const ticketNames = Array.from(document.querySelectorAll('#ticket-names-container input'))
+                .map(input => input.value.trim());
+            if (ticketNames.length !== qty || ticketNames.some(name => !name)) {
+                alert('Isi nama pemilik untuk setiap tiket.');
+                return;
+            }
+            let totalPrice = currentUnitPrice * qty;
+            if (isVoucherApplied && qty >= 3) totalPrice -= 50000;
+
+            const orderData = {
+                destId: destination.id,
+                destName: destination.name,
+                destDate: destination.date || '',
+                destTime: destination.time || '',
+                vehicle: destination.vehicle || 'Bus (60 kursi)',
+                customerName: document.getElementById('buyer-name').value,
+                customerPhone: document.getElementById('buyer-phone').value,
+                quantity: qty,
+                ticketNames: ticketNames,
+                seatNumbers: [],
+                totalPrice: totalPrice,
+                paymentProof: proofUrl,
+                status: 'Pending', // Pending, Approved, Rejected
+                createdAt: Date.now()
+            };
+
+            try {
+                const orders = readStoredItems(ORDERS_STORAGE_KEY);
+                orders.push({ id: createLocalId(), ...orderData });
+                saveStoredItems(ORDERS_STORAGE_KEY, orders);
+                refreshStoredData();
+                alert("Pesanan berhasil dikirim! Silakan tunggu konfirmasi (ACC) dari Admin.");
+                closeBookingModal();
+                switchTab('orders');
+            } catch (err) {
+                console.error("Gagal mengirim pesanan:", err);
+                alert("Gagal mengirim pesanan. Pastikan penyimpanan browser tersedia.");
+            }
+        }
+
+        // Render Riwayat Pesanan
+        function renderOrders() {
+            const container = document.getElementById('orders-container');
+            if (ordersCache.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-slate-400">Belum ada riwayat pesanan.</div>`;
+                return;
+            }
+
+            container.innerHTML = ordersCache.map(o => {
+                let statusBadge = '';
+                if (o.status === 'Pending') statusBadge = `<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-semibold">Menunggu ACC Admin</span>`;
+                else if (o.status === 'Approved') statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">Disetujui (ACC)</span>`;
+                else statusBadge = `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">Ditolak</span>`;
+
+                return `
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-3">
+                                <h4 class="font-bold text-base text-slate-900">${o.destName}</h4>
+                                ${statusBadge}
+                            </div>
+                            <p class="text-xs text-slate-500">Pemesan: <span class="font-semibold text-slate-700">${o.customerName}</span> (${o.customerPhone})</p>
+                            <p class="text-xs text-slate-500">Jumlah: <span class="font-semibold text-slate-700">${o.quantity} Tiket</span> | Total: <span class="font-semibold text-primary">Rp ${Number(o.totalPrice).toLocaleString('id-ID')}</span></p>
+                            <p class="text-xs text-slate-500">Nama pemilik tiket: <span class="font-semibold text-slate-700">${(o.ticketNames || [o.customerName]).map(escapeHtml).join(', ')}</span></p>
+                            <p class="text-xs text-slate-500">Kendaraan: <span class="font-semibold text-slate-700">${o.vehicle || 'Bus (60 kursi)'}</span> | Kursi: <span class="font-semibold text-slate-700">${Array.isArray(o.seatNumbers) && o.seatNumbers.length ? o.seatNumbers.join(', ') : 'Admin akan tentukan'}</span></p>
+                            <p class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i> Keberangkatan: ${o.destDate || '-'} (${o.destTime || '-'})</p>
+                        </div>
+                        ${o.status === 'Approved' ? `
+                            <div>
+                                <button onclick="openEticketModal('${o.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-medium shadow transition">
+                                    <i class="fa-solid fa-ticket mr-1"></i> Lihat E-Ticket
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render E-Tickets (Hanya yang Approved)
+        function renderETickets() {
+            const container = document.getElementById('etickets-container');
+            const approvedOrders = ordersCache.filter(o => o.status === 'Approved');
+
+            if (approvedOrders.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-slate-400 col-span-full">Belum ada E-Ticket aktif. Pesanan yang sudah di-ACC admin akan tampil di sini.</div>`;
+                return;
+            }
+
+            container.innerHTML = approvedOrders.map(o => `
+                <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-lg space-y-4 relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 text-slate-800/40 text-8xl"><i class="fa-solid fa-ticket"></i></div>
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                        <span class="text-xs font-semibold bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> E-Ticket Resmi</span>
+                        <span class="text-xs text-slate-400">ID: ${o.id.substring(0, 6)}</span>
+                    </div>
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-lg">${o.destName}</h4>
+                        <div class="grid grid-cols-2 gap-2 text-xs text-slate-300">
+                            <div><p class="text-slate-400">Pemesan:</p><p class="font-semibold text-white">${o.customerName}</p></div>
+                            <div><p class="text-slate-400">Jumlah:</p><p class="font-semibold text-white">${o.quantity} Tiket</p></div>
+                            <div class="col-span-2"><p class="text-slate-400">Nama pemilik tiket:</p><p class="font-semibold text-white">${(o.ticketNames || [o.customerName]).map(escapeHtml).join(', ')}</p></div>
+                            <div><p class="text-slate-400">Tanggal:</p><p class="font-semibold text-sky-400">${o.destDate || '-'}</p></div>
+                            <div><p class="text-slate-400">Waktu:</p><p class="font-semibold text-sky-400">${o.destTime || '-'}</p></div>
+                            <div><p class="text-slate-400">Kendaraan:</p><p class="font-semibold text-white">${o.vehicle || 'Bus (60 kursi)'}</p></div>
+                            <div><p class="text-slate-400">Kursi:</p><p class="font-semibold text-white">${Array.isArray(o.seatNumbers) && o.seatNumbers.length ? o.seatNumbers.join(', ') : 'Admin akan tentukan'}</p></div>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700 flex justify-end">
+                        <button onclick="openEticketModal('${o.id}')" class="px-4 py-2 bg-primary hover:bg-sky-600 text-white rounded-xl text-xs font-semibold shadow transition">
+                            <i class="fa-solid fa-share-nodes mr-1"></i> Pamerkan Tiket
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal E-Ticket Pamer Sosmed
+        function openEticketModal(orderId) {
+            const order = ordersCache.find(item => item.id === orderId);
+            if (!order) return;
+            document.getElementById('etick-dest').innerText = order.destName;
+            document.getElementById('etick-name').innerText = order.customerName;
+            document.getElementById('etick-ticket-names').innerText = (order.ticketNames || [order.customerName]).join(', ');
+            document.getElementById('etick-qty').innerText = `${order.quantity} Tiket`;
+            document.getElementById('etick-vehicle').innerText = order.vehicle || 'Bus (60 kursi)';
+            document.getElementById('etick-seats').innerText = Array.isArray(order.seatNumbers) && order.seatNumbers.length ? order.seatNumbers.join(', ') : 'Admin akan tentukan';
+            document.getElementById('etick-date').innerText = order.destDate || '-';
+            document.getElementById('etick-time').innerText = order.destTime || '-';
+            document.getElementById('eticket-modal').classList.remove('hidden');
+        }
+
+        function closeEticketModal() {
+            document.getElementById('eticket-modal').classList.add('hidden');
+        }
+
+        initBuyerApp();
+
+        // Fitur Share ke Sosial Media (Web Share API / Clipboard)
+        function shareTicket() {
+            const dest = document.getElementById('etick-dest').innerText;
+            const name = document.getElementById('etick-name').innerText;
+            const qty = document.getElementById('etick-qty').innerText;
+            const vehicle = document.getElementById('etick-vehicle').innerText;
+            const seats = document.getElementById('etick-seats').innerText;
+            const date = document.getElementById('etick-date').innerText;
+            const time = document.getElementById('etick-time').innerText;
+
+            const ticketNames = document.getElementById('etick-ticket-names').innerText;
+            const shareText = `Yeay! Aku mau liburan ke ${dest} (${qty}) pada ${date} pukul ${time} dengan ${vehicle}. Pemilik tiket: ${ticketNames}. Kursi: ${seats}. Pakai TravelNesia! 🌊✈️`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'E-Ticket Liburan TravelNesia',
+                    text: shareText,
+                    url: window.location.href,
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(shareText)
+                    .then(() => alert("Teks tiket berhasil disalin ke clipboard! Silakan tempel (paste) ke status atau media sosialmu."))
+                    .catch(error => {
+                        console.error('Gagal menyalin tiket:', error);
+                        alert('Tidak dapat menyalin tiket. Silakan coba fitur berbagi atau salin teks secara manual.');
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
